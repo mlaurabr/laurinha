@@ -1,0 +1,136 @@
+import React, { useState } from 'react';
+
+const PropostaDeNamoro = () => {
+  const [resposta, setResposta] = useState('');
+  const [posicaoBotaoNao, setPosicaoBotaoNao] = useState({ top: 0, left: 0 });
+  const [confetes, setConfetes] = useState([]);
+  
+  const fugirDoNao = () => {
+    const novaTop = Math.random() * 300;
+    const novaLeft = Math.random() * 300;
+    setPosicaoBotaoNao({ top: novaTop, left: novaLeft });
+  };
+  
+  const criarConfetes = () => {
+    return Array.from({ length: 100 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      size: Math.random() * 6 + 4,
+      rotacao: Math.random() * 360,
+      delay: Math.random() * 3,
+      color: [
+        '#FF0000', // vermelho
+        '#FF1111',
+        '#FF2222',
+        '#FF3333',
+        '#FF4444',
+        '#FF5555',
+      ][Math.floor(Math.random() * 6)],
+      duration: Math.random() * 2 + 3
+    }));
+  };
+  
+  const aceitarProposta = () => {
+    setResposta('❤️ AEEEEE PORRAAAAAA! ❤️');
+    setConfetes(criarConfetes());
+    
+    let count = 0;
+    const interval = setInterval(() => {
+      if (count < 4) {
+        setConfetes(prev => [...prev, ...criarConfetes()]);
+        count++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 500);
+  };
+  
+  return (
+    <div className="relative flex flex-col items-center justify-center min-h-screen p-8 overflow-hidden">
+      {confetes.map((confete) => (
+        <div
+          key={confete.id}
+          className="absolute -top-10 animate-confetti"
+          style={{
+            left: `${confete.left}%`,
+            width: `${confete.size}px`,
+            height: `${confete.size}px`,
+            transform: `rotate(${confete.rotacao}deg)`,
+            animationDelay: `${confete.delay}s`,
+            animationDuration: `${confete.duration}s`,
+            backgroundColor: confete.color,
+            zIndex: 50,
+          }}
+        />
+      ))}
+      
+      <div className="flex flex-col items-center justify-center space-y-6 z-10">
+        <h1 className="text-4xl font-bold text-black animate-pulse">
+          Quer namorar comigo mô? {!resposta && '💝'}
+        </h1>
+        
+        {!resposta ? (
+          <div className="relative w-64 h-64">
+            <button
+              onClick={aceitarProposta}
+              className="absolute top-0 left-0 px-8 py-3 text-lg font-bold text-white bg-red-600 rounded-lg shadow-lg transform hover:scale-110 hover:bg-red-700 transition-all duration-300"
+            >
+              Sim 💖
+            </button>
+            
+            <button
+              style={{
+                position: 'absolute',
+                top: `${posicaoBotaoNao.top}px`,
+                left: `${posicaoBotaoNao.left}px`,
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={fugirDoNao}
+              className="px-8 py-3 text-lg font-bold text-white bg-red-600 rounded-lg shadow-lg hover:bg-red-700"
+            >
+              Não 💔
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="text-3xl font-bold text-red-600 animate-bounce">
+              {resposta}
+            </div>
+            <div className="text-xl text-red-500 animate-pulse">
+              💑 Agora é oficial! 💑
+            </div>
+            <div className="flex space-x-2 text-2xl animate-bounce">
+              {'❤️💕💖'.split('').map((emoji, i) => (
+                <span key={i} style={{ animationDelay: `${i * 0.2}s` }}>
+                  {emoji}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes confetti {
+    0% {
+      transform: translateY(0) rotate(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+  
+  .animate-confetti {
+    animation: confetti linear forwards;
+    position: absolute;
+  }
+`;
+document.head.appendChild(style);
+
+export default PropostaDeNamoro;
